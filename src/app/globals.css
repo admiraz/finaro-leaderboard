@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    height: 100%;
+    background-color: #FAFAF8;
+    color: #111111;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #__next {
+    height: 100%;
+  }
+}
+
+@layer components {
+  /* Rank 1 — subtle tint + thin green accent line, no heavy block */
+  .leaderboard-row-1 {
+    border-left: 3px solid #3A7F6B;
+    background-color: #F4FAF6;
+  }
+
+  /* Rank 2–3 and default — clean white, no left decoration */
+  .leaderboard-row-2,
+  .leaderboard-row-3,
+  .leaderboard-row-default {
+    border-left: none;
+    background-color: #FFFFFF;
+  }
+}
+
+/* ── Live indicator pulse ─────────────────────────────────── */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1;    transform: scale(1);    }
+  50%       { opacity: 0.3; transform: scale(0.85); }
+}
+
+.live-dot {
+  animation: live-pulse 2.2s ease-in-out infinite;
+}
+
+/* ── Progress bar fill-in on mount ───────────────────────── */
+@keyframes progress-fill {
+  from { width: 0%; }
+  to   { width: var(--progress-target); }
+}
+
+.progress-fill {
+  animation: progress-fill 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

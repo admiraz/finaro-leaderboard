@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/xamppp/htdocs//**)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\BS Int - Lenovo uno\\\\AppData\\\\Roaming\\\\npm\")"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --app --src-dir --no-eslint --import-alias \"@/*\" --yes)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(mv next.config.ts next.config.mjs)",
+      "Bash(echo \"/** @type {import\\(''''next''''\\).NextConfig} */:*)",
+      "Bash(npx tsc:*)",
+      "Bash(\"c:\\\\xamppp\\\\htdocs\\\\RankingSystem\\\\data\\\\leaderboard.json\")"
+    ]
+  }
+}
