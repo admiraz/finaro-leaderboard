@@ -18,12 +18,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Excel fetch failed: ${msg}` }, { status: 500 });
   }
 
-  const existing = getStoredResponses();
+  const existing = await getStoredResponses();
   const existingIds = new Set(existing.map((r) => r.id));
 
   const newRows = excelRows.filter((r) => !existingIds.has(r.id));
   if (newRows.length > 0) {
-    saveStoredResponses([...existing, ...newRows]);
+    await saveStoredResponses([...existing, ...newRows]);
   }
 
   return NextResponse.json({

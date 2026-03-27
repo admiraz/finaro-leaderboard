@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  saveStoredResponses([]);
+  await saveStoredResponses([]);
 
   return NextResponse.json({ ok: true, message: 'Live store cleared.' });
 }

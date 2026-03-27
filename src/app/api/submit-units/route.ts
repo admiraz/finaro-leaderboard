@@ -1,46 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { addStoredResponse } from '@/lib/data/live-store';
-import { archiveSubmission } from '@/lib/data/excel-archive';
-import { employees } from '@/lib/data/employees';
-import type { FormResponse } from '@/lib/types';
+import { Redis } from '@upstash/redis';
+import { NextResponse } from 'next/server';
 
-const VALID_NAMES = new Set(Object.keys(employees));
+const redis = Redis.fromEnv();
 
-export async function POST(req: NextRequest) {
-  let body: Record<string, unknown>;
+type LeaderboardEntry = {
+  name: string;
+  units: number;
+};
+
+export async function POST(req: Request) {
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'Ungültige Anfrage' }, { status: 400 });
+    const body = await req.json();
+    const { name, units } = body as { name?: string; units?: number | string };
+
+    if (!name || units === undefined || units === null) {
+      return NextResponse.json({ error: 'Missing data' }, { status: 400 });
+    }
+
+    const parsedUnits = Number(units);
+
+    if (!Number.isFinite(parsedUnits) || parsedUnits <= 0) {
+      return NextResponse.json({ error: 'Invalid units' }, { status: 400 });
+    }
+
+    const key = 'leaderboard';
+
+    const stored = await redis.get<LeaderboardEntry[]>(key);
+    const leaderboard: LeaderboardEntry[] = Array.isArray(stored) ? stored : [];
+
+    const existing = leaderboard.find((u) => u.name === name);
+
+    if (existing) {
+      existing.units += parsedUnits;
+    } else {
+      leaderboard.push({ name, units: parsedUnits });
+    }
+
+    leaderboard.sort((a, b) => b.units - a.units);
+
+    await redis.set(key, leaderboard);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
-
-  const mitarbeiter = String(body.mitarbeiter ?? '').trim();
-  const einheiten = Number(body.einheiten);
-
-  if (!mitarbeiter || !VALID_NAMES.has(mitarbeiter)) {
-    return NextResponse.json({ error: 'Ungültiger Mitarbeiter' }, { status: 400 });
-  }
-  if (!Number.isFinite(einheiten) || einheiten <= 0) {
-    return NextResponse.json({ error: 'Einheiten muss grösser als 0 sein' }, { status: 400 });
-  }
-
-  const entry: FormResponse = {
-    id: crypto.randomUUID(),
-    timestamp: new Date().toISOString(),
-    mitarbeiter,
-    einheiten,
-  };
-
-  // ── Primary: local live-store (always required) ────────────────────────────
-  const result = addStoredResponse(entry);
-
-  // ── Secondary: Excel archival (best-effort, fire and forget) ──────────────
-  archiveSubmission(entry).catch((err) => {
-    console.error('[Archive] Excel-Archivierung fehlgeschlagen:', err instanceof Error ? err.message : err);
-  });
-
-  return NextResponse.json(
-    { ok: true, added: result.added, id: entry.id },
-    { status: 201 }
-  );
 }

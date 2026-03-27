@@ -1,27 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getFormResponses } from '@/lib/data/adapter';
-import { filterByPeriod, sumByEmployee, rankEmployees, calcStats } from '@/lib/aggregations';
-import type { Period } from '@/lib/types';
+import { Redis } from '@upstash/redis';
+import { NextResponse } from 'next/server';
 
-const VALID_PERIODS: Period[] = ['today', 'week', 'month'];
+const redis = Redis.fromEnv();
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  // Default 'month' so all recent test submissions are visible during setup.
-  // Change back to 'today' once live data is confirmed working.
-  const rawPeriod = searchParams.get('period') ?? 'today';
-  const period: Period = VALID_PERIODS.includes(rawPeriod as Period)
-    ? (rawPeriod as Period)
-    : 'today';
+type LeaderboardEntry = {
+  name: string;
+  units: number;
+};
 
-  const responses = await getFormResponses();
-  const filtered = filterByPeriod(responses, period);
-  const summaries = sumByEmployee(filtered);
-  const ranked = rankEmployees(summaries);
-  const stats = calcStats(ranked);
-
-  return NextResponse.json(
-    { ranked, stats },
-    { headers: { 'Cache-Control': 'no-store' } }
-  );
+export async function GET() {
+  try {
+    const stored = await redis.get<LeaderboardEntry[]>('leaderboard');
+    const leaderboard: LeaderboardEntry[] = Array.isArray(stored) ? stored : [];
+    return NextResponse.json(leaderboard);
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
 }

@@ -5,7 +5,6 @@ import type { FormResponse } from '@/lib/types';
 const WEBHOOK_SECRET = process.env.FORMS_WEBHOOK_SECRET ?? '';
 
 export async function POST(req: NextRequest) {
-  // Auth check
   const secret = req.headers.get('x-webhook-secret') ?? '';
   if (WEBHOOK_SECRET && secret !== WEBHOOK_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  // Extract + normalize fields
   const mitarbeiter = String(body.mitarbeiter ?? body.name ?? '').trim();
   const einheiten = Number(body.einheiten ?? body.units ?? 0);
   const id = String(body.id ?? crypto.randomUUID());
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const entry: FormResponse = { id, timestamp, mitarbeiter, einheiten };
-  const result = addStoredResponse(entry);
+  const result = await addStoredResponse(entry);
 
   return NextResponse.json(
     { ok: true, added: result.added, id },
