@@ -39,6 +39,7 @@ export interface LeaderboardData {
   lastUpdated: Date | null;
   isLoading: boolean;
   error: string | null;
+  refresh: () => void;
 }
 
 // API response shape

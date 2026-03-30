@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { LeaderboardData, Period, ApiResponse } from '@/lib/types';
 import { REFRESH_INTERVAL } from '@/config/dashboard';
 
-const initialState: LeaderboardData = {
+const initialState: Omit<LeaderboardData, 'refresh'> = {
   ranked: [],
   stats: {
     totalUnits: 0,
@@ -19,7 +19,7 @@ const initialState: LeaderboardData = {
 };
 
 export function useLeaderboard(period: Period): LeaderboardData {
-  const [data, setData] = useState<LeaderboardData>(initialState);
+  const [data, setData] = useState<Omit<LeaderboardData, 'refresh'>>(initialState);
 
   const fetchData = useCallback(
     async (isInitial = false) => {
@@ -58,5 +58,5 @@ export function useLeaderboard(period: Period): LeaderboardData {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return data;
+  return { ...data, refresh: () => fetchData(true) };
 }

@@ -4,22 +4,25 @@ import { NextResponse } from 'next/server';
 const redis = Redis.fromEnv();
 
 type LeaderboardEntry = {
-  name: string;
-  units: number;
+  mitarbeiter: string;
+  einheiten: number;
 };
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, units } = body as { name?: string; units?: number | string };
+    const {
+      mitarbeiter,
+      einheiten,
+    } = body as { mitarbeiter?: string; einheiten?: number | string };
 
-    if (!name || units === undefined || units === null) {
+    if (!mitarbeiter || einheiten === undefined || einheiten === null) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    const parsedUnits = Number(units);
+    const parsedEinheiten = Number(einheiten);
 
-    if (!Number.isFinite(parsedUnits) || parsedUnits <= 0) {
+    if (!Number.isFinite(parsedEinheiten) || parsedEinheiten <= 0) {
       return NextResponse.json({ error: 'Invalid units' }, { status: 400 });
     }
 
@@ -28,15 +31,15 @@ export async function POST(req: Request) {
     const stored = await redis.get<LeaderboardEntry[]>(key);
     const leaderboard: LeaderboardEntry[] = Array.isArray(stored) ? stored : [];
 
-    const existing = leaderboard.find((u) => u.name === name);
+    const existing = leaderboard.find((u) => u.mitarbeiter === mitarbeiter);
 
     if (existing) {
-      existing.units += parsedUnits;
+      existing.einheiten += parsedEinheiten;
     } else {
-      leaderboard.push({ name, units: parsedUnits });
+      leaderboard.push({ mitarbeiter, einheiten: parsedEinheiten });
     }
 
-    leaderboard.sort((a, b) => b.units - a.units);
+    leaderboard.sort((a, b) => b.einheiten - a.einheiten);
 
     await redis.set(key, leaderboard);
 

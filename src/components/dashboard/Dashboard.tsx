@@ -9,7 +9,13 @@ import Leaderboard from './Leaderboard';
 
 export default function Dashboard() {
   const [period, setPeriod] = useState<Period>('today');
-  const { ranked, lastUpdated, isLoading, error } = useLeaderboard(period);
+  const { ranked, lastUpdated, isLoading, error, refresh } = useLeaderboard(period);
+
+  async function handleReset() {
+    if (!window.confirm('Alle Einträge löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+    await fetch('/api/admin/clear', { method: 'POST' });
+    refresh();
+  }
 
   return (
     <div className="h-screen flex flex-col bg-fin-bg text-fin-text overflow-hidden">
@@ -17,6 +23,7 @@ export default function Dashboard() {
         period={period}
         onPeriodChange={setPeriod}
         lastUpdated={lastUpdated}
+        onReset={handleReset}
       />
 
       <PrizeBanner />

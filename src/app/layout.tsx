@@ -12,6 +12,10 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: 'Finaro Leaderboard',
   description: 'Live performance tracking dashboard',
+  icons: {
+    icon: '/images/finarologo.png',
+    apple: '/images/finarologo.png',
+  },
 };
 
 export const viewport: Viewport = {
