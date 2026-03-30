@@ -44,8 +44,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={spaceGrotesk.variable}>
-      <body className="h-full bg-fin-bg text-fin-text font-sans">
-        {children}
+      <body className="min-h-screen overflow-y-auto bg-fin-bg text-fin-text font-sans">        {children}
       </body>
     </html>
   );

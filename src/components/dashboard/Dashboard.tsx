@@ -44,41 +44,40 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-fin-bg text-fin-text overflow-hidden">
-      <Header
-        period={period}
-        onPeriodChange={setPeriod}
-        lastUpdated={lastUpdated}
-        onReset={handleReset}
-        isResetting={isResetting}
-      />
+  <div className="min-h-screen flex flex-col bg-fin-bg text-fin-text overflow-y-auto">
+    <Header
+      period={period}
+      onPeriodChange={setPeriod}
+      lastUpdated={lastUpdated}
+      onReset={handleReset}
+      isResetting={isResetting}
+    />
 
-      {/* Content: prize column left, leaderboard right */}
-      <div className="flex-1 flex overflow-hidden">
-        <PrizeBanner />
+    <div className="flex-1 flex flex-col lg:flex-row">
+      <PrizeBanner />
 
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {isLoading ? (
-            <div className="flex-1 flex flex-col items-center justify-center bg-fin-bg">
-              <div className="text-[0.5rem] font-semibold tracking-[0.4em] text-fin-faint uppercase mb-5">
-                Finaro Leaderboard
-              </div>
-              <div className="text-xl sm:text-2xl font-black tracking-tight text-fin-text uppercase mb-4">
-                Laden…
-              </div>
-              <div className="w-8 h-px bg-fin-border" />
+      <div className="flex-1 flex flex-col">
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center bg-fin-bg">
+            <div className="text-[0.5rem] font-semibold tracking-[0.4em] text-fin-faint uppercase mb-5">
+              Finaro Leaderboard
             </div>
-          ) : (
-            <Leaderboard ranked={ranked} />
-          )}
-        </div>
+            <div className="text-xl sm:text-2xl font-black tracking-tight text-fin-text uppercase mb-4">
+              Laden…
+            </div>
+            <div className="w-8 h-px bg-fin-border" />
+          </div>
+        ) : (
+          <Leaderboard ranked={ranked} />
+        )}
       </div>
-
-      {error && (
-        <div className="flex-shrink-0 px-5 py-2 bg-red-50 border-t border-red-200 text-red-600 text-[0.6rem] font-bold tracking-[0.2em] uppercase">
-          {error}
-        </div>
-      )}
     </div>
-  );
+
+    {error && (
+      <div className="flex-shrink-0 px-5 py-2 bg-red-50 border-t border-red-200 text-red-600 text-[0.6rem] font-bold tracking-[0.2em] uppercase">
+        {error}
+      </div>
+    )}
+  </div>
+);
 }
