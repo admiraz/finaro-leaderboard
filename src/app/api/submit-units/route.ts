@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { addStoredResponse } from '@/lib/data/live-store';
 import type { FormResponse } from '@/lib/types';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function POST(req: Request) {
   console.log('[submit-units] route hit');

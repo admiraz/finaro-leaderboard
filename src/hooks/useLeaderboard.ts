@@ -28,8 +28,11 @@ export function useLeaderboard(period: Period): LeaderboardData {
       }
 
       try {
-        const res = await fetch(`/api/leaderboard?period=${period}&t=${Date.now()}`, {
+        // Always bust the cache — critical for smart TV browsers that ignore Cache-Control
+        const url = `/api/leaderboard?period=${period}&t=${Date.now()}&r=${Math.random().toString(36).slice(2)}`;
+        const res = await fetch(url, {
           cache: 'no-store',
+          headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' },
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -45,7 +48,6 @@ export function useLeaderboard(period: Period): LeaderboardData {
         });
       } catch (e) {
         const msg = e instanceof Error ? e.message : 'Unknown error';
-
         setData((prev) => ({
           ...prev,
           isLoading: false,
@@ -76,15 +78,25 @@ export function useLeaderboard(period: Period): LeaderboardData {
     });
   }, []);
 
+  // Interval-based polling
   useEffect(() => {
     fetchData(true);
     const interval = setInterval(() => fetchData(false), REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return {
-    ...data,
-    refresh,
-    clearLocal,
-  };
+  // Page Visibility API — force re-fetch when TV browser wakes up / tab becomes visible
+  // This is the main mitigation for smart TV browsers that pause JS intervals
+  useEffect(() => {
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        console.log('[leaderboard] tab became visible — forcing refresh');
+        fetchData(false);
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [fetchData]);
+
+  return { ...data, refresh, clearLocal };
 }

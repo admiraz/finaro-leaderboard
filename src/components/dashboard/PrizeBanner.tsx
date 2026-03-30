@@ -1,35 +1,33 @@
 export default function PrizeBanner() {
   return (
-    <div className="bg-fin-surface border-b border-fin-border flex-shrink-0">
-      <div className="flex flex-col items-center text-center px-6 py-8 sm:py-10 lg:py-5 xl:py-7">
+    <aside className="w-44 lg:w-48 xl:w-52 flex-shrink-0 border-r border-fin-border bg-fin-surface flex flex-col items-center justify-center px-4 py-6 text-center gap-3">
 
-        {/* Eyebrow — tiny, heavily tracked */}
-        <p className="text-[0.44rem] sm:text-[0.48rem] font-semibold tracking-[0.55em] text-fin-muted uppercase mb-4 sm:mb-5 lg:mb-3">
-          1. Platz gewinnt
-        </p>
+      {/* Eyebrow */}
+      <p className="text-[0.42rem] font-semibold tracking-[0.5em] text-fin-muted uppercase">
+        1. Platz gewinnt
+      </p>
 
-        {/* Product image — hero anchor */}
-        <img
-          src="/images/iphone-17-pro-colors.png"
-          alt="iPhone"
-          className="h-36 sm:h-44 md:h-52 lg:h-36 xl:h-44 object-contain select-none mb-4 sm:mb-5 lg:mb-3"
-          draggable={false}
-        />
+      {/* Prize image */}
+      <img
+        src="/images/1000fr.jpg"
+        alt="1000 CHF"
+        className="h-24 lg:h-28 xl:h-32 w-auto object-contain select-none"
+        draggable={false}
+      />
 
-        {/* Prize headline — magazine scale */}
-        <p className="text-6xl sm:text-7xl md:text-8xl lg:text-6xl xl:text-7xl font-black tracking-tight text-fin-text leading-none mb-3 sm:mb-4 lg:mb-3">
-          iPhone
-        </p>
+      {/* Prize headline */}
+      <p className="text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-fin-text leading-none">
+        1000 CHF
+      </p>
 
-        {/* Hairline */}
-        <div className="w-8 h-px bg-fin-border mb-3" />
+      {/* Hairline */}
+      <div className="w-6 h-px bg-fin-border" />
 
-        {/* Tension line — barely visible, just enough to create close */}
-        <p className="text-[0.44rem] sm:text-[0.48rem] font-medium tracking-[0.45em] text-fin-faint uppercase">
-          Nur Platz 1 gewinnt
-        </p>
+      {/* Tension line */}
+      <p className="text-[0.42rem] font-medium tracking-[0.4em] text-fin-faint uppercase">
+        Nur Platz 1 gewinnt
+      </p>
 
-      </div>
-    </div>
+    </aside>
   );
 }

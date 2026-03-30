@@ -1,28 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { ALL_EMPLOYEES } from '@/config/employees';
 
-const EMPLOYEES = [
-  'Admir Bocerri',
-  'Alfonso Allende',
-  'Ardit Arifi',
-  'Arijan Qollaku',
-  'Berivan Coban',
-  'Besmira Jahija',
-  'Destan Celik',
-  'Dion Maliqi',
-  'Endrit Beadini',
-  'Erand Vinca',
-  'Feim Sahiti',
-  'Fjolla Shaqiri',
-  'Idriz Ajeti',
-  'Imran Hamzic',
-  'Isra Daljipi',
-  'Leart Ajeti',
-  'Metin Beadini',
-  'Milad Ahmadyar',
-  'Riza Ahmeti',
-];
+const EMPLOYEES = ALL_EMPLOYEES;
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -85,9 +66,13 @@ export default function SubmitPage() {
 
       {/* Header */}
       <div className="mb-8 sm:mb-10 text-center">
-        <p className="text-xs font-semibold tracking-[0.2em] text-fin-accent uppercase mb-2">
-          Finaro
-        </p>
+        <div className="flex flex-col items-center mb-6">
+        <img
+          src="/images/finarologo.png"
+          alt="Finaro"
+          className="h-7 object-contain"
+        />
+      </div>
         <h1 className="text-2xl sm:text-3xl font-bold text-fin-text tracking-tight">
           Einheiten erfassen
         </h1>
