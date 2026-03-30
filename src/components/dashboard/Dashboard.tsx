@@ -9,13 +9,40 @@ import Leaderboard from './Leaderboard';
 
 export default function Dashboard() {
   const [period, setPeriod] = useState<Period>('today');
-  const { ranked, lastUpdated, isLoading, error, refresh } = useLeaderboard(period);
+  const [isResetting, setIsResetting] = useState(false);
+  const { ranked, stats, lastUpdated, isLoading, error, refresh, clearLocal } = useLeaderboard(period);
+  const handleReset = async () => {
+  if (!confirm('Are you sure you want to clear all results?')) return;
 
-  async function handleReset() {
-    if (!window.confirm('Alle Einträge löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
-    await fetch('/api/admin/clear', { method: 'POST' });
-    refresh();
+  try {
+    setIsResetting(true);
+    console.log('[reset] button clicked — starting clear request');
+
+    const res = await fetch('/api/admin/clear', {
+      method: 'POST',
+      cache: 'no-store',
+    });
+
+    const payload = await res.json();
+
+    console.log('[reset] response status:', res.status);
+    console.log('[reset] payload:', payload);
+
+    if (!res.ok) {
+      throw new Error(payload?.error || 'Reset failed');
+    }
+
+    clearLocal();
+    await refresh();
+
+    console.log('[reset] leaderboard cleared and refreshed');
+  } catch (error) {
+    console.error('[reset] failed:', error);
+    alert('Reset failed');
+  } finally {
+    setIsResetting(false);
   }
+};
 
   return (
     <div className="h-screen flex flex-col bg-fin-bg text-fin-text overflow-hidden">
@@ -24,6 +51,7 @@ export default function Dashboard() {
         onPeriodChange={setPeriod}
         lastUpdated={lastUpdated}
         onReset={handleReset}
+        isResetting={isResetting}
       />
 
       <PrizeBanner />

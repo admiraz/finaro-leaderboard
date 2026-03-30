@@ -13,8 +13,26 @@ export const metadata: Metadata = {
   title: 'Finaro Leaderboard',
   description: 'Live performance tracking dashboard',
   icons: {
-    icon: '/images/finarologo.png',
-    apple: '/images/finarologo.png',
+    icon: [
+      {
+        url: '/images/favicon-light.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/images/favicon-dark.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+    apple: [
+      {
+        url: '/images/favicon-light.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/images/favicon-dark.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
   },
 };
 

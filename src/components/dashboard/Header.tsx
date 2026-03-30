@@ -10,9 +10,10 @@ interface Props {
   onPeriodChange: (p: Period) => void;
   lastUpdated: Date | null;
   onReset?: () => void;
+  isResetting?: boolean;
 }
 
-export default function Header({ period, onPeriodChange, lastUpdated: _lastUpdated, onReset }: Props) {
+export default function Header({ period, onPeriodChange, lastUpdated: _lastUpdated, onReset, isResetting }: Props) {
   return (
     <header className="flex items-center justify-between px-5 sm:px-8 md:px-12 lg:px-14 xl:px-16 py-3 md:py-4 lg:py-5 border-b border-fin-border bg-fin-surface flex-shrink-0">
 
@@ -37,10 +38,11 @@ export default function Header({ period, onPeriodChange, lastUpdated: _lastUpdat
             <div className="hidden sm:block w-px h-3 bg-fin-border flex-shrink-0" />
             <button
               onClick={onReset}
-              className="hidden sm:block text-[0.55rem] font-semibold tracking-widest text-fin-faint uppercase hover:text-fin-muted transition-colors"
+              disabled={isResetting}
+              className="hidden sm:block text-[0.55rem] font-semibold tracking-widest text-fin-faint uppercase hover:text-fin-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               title="Alle Einträge löschen"
             >
-              Reset
+              {isResetting ? 'Clearing…' : 'Reset'}
             </button>
           </>
         )}

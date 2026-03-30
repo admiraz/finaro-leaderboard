@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { LeaderboardData, Period, ApiResponse } from '@/lib/types';
 import { REFRESH_INTERVAL } from '@/config/dashboard';
 
-const initialState: Omit<LeaderboardData, 'refresh'> = {
+const initialState: Omit<LeaderboardData, 'refresh' | 'clearLocal'> = {
   ranked: [],
   stats: {
     totalUnits: 0,
@@ -19,7 +19,7 @@ const initialState: Omit<LeaderboardData, 'refresh'> = {
 };
 
 export function useLeaderboard(period: Period): LeaderboardData {
-  const [data, setData] = useState<Omit<LeaderboardData, 'refresh'>>(initialState);
+  const [data, setData] = useState<Omit<LeaderboardData, 'refresh' | 'clearLocal'>>(initialState);
 
   const fetchData = useCallback(
     async (isInitial = false) => {
@@ -28,12 +28,16 @@ export function useLeaderboard(period: Period): LeaderboardData {
       }
 
       try {
-        const res = await fetch(`/api/leaderboard?period=${period}&t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const res = await fetch(`/api/leaderboard?period=${period}&t=${Date.now()}`, {
+          cache: 'no-store',
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const json: ApiResponse = await res.json();
 
         setData({
-          ranked: json.ranked,
+          ranked: json.ranked ?? [],
           stats: json.stats,
           lastUpdated: new Date(),
           isLoading: false,
@@ -41,7 +45,7 @@ export function useLeaderboard(period: Period): LeaderboardData {
         });
       } catch (e) {
         const msg = e instanceof Error ? e.message : 'Unknown error';
-        // Keep last good data visible; just update error + isLoading
+
         setData((prev) => ({
           ...prev,
           isLoading: false,
@@ -52,11 +56,35 @@ export function useLeaderboard(period: Period): LeaderboardData {
     [period]
   );
 
+  const refresh = useCallback(async () => {
+    await fetchData(true);
+  }, [fetchData]);
+
+  const clearLocal = useCallback(() => {
+    setData({
+      ranked: [],
+      stats: {
+        totalUnits: 0,
+        topPerformer: '—',
+        topPerformerUnits: 0,
+        activeCount: 0,
+        teamAvg: 0,
+      },
+      lastUpdated: new Date(),
+      isLoading: false,
+      error: null,
+    });
+  }, []);
+
   useEffect(() => {
     fetchData(true);
     const interval = setInterval(() => fetchData(false), REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  return { ...data, refresh: () => fetchData(true) };
+  return {
+    ...data,
+    refresh,
+    clearLocal,
+  };
 }

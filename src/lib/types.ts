@@ -35,11 +35,18 @@ export type Period = 'today' | 'week' | 'month';
 // Hook return shape
 export interface LeaderboardData {
   ranked: RankedEmployee[];
-  stats: AggregatedStats;
+  stats: {
+    totalUnits: number;
+    topPerformer: string;
+    topPerformerUnits: number;
+    activeCount: number;
+    teamAvg: number;
+  };
   lastUpdated: Date | null;
   isLoading: boolean;
   error: string | null;
-  refresh: () => void;
+  refresh: () => Promise<void>;
+  clearLocal: () => void;
 }
 
 // API response shape

@@ -62,10 +62,12 @@ function fileSetAll(responses: FormResponse[]): void {
 // ── Public API (all async — same interface regardless of backend) ──────────────
 
 export async function getStoredResponses(): Promise<FormResponse[]> {
+  console.log(`[live-store] READ — backend: ${USE_REDIS ? 'Redis' : 'file'} — key: ${REDIS_KEY}`);
   return USE_REDIS ? redisGetAll() : fileGetAll();
 }
 
 export async function saveStoredResponses(responses: FormResponse[]): Promise<void> {
+  console.log(`[live-store] WRITE — backend: ${USE_REDIS ? 'Redis' : 'file'} — key: ${REDIS_KEY} — count: ${responses.length}`);
   if (USE_REDIS) return redisSetAll(responses);
   fileSetAll(responses);
 }
