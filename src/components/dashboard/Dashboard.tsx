@@ -1,16 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import type { Period } from '@/lib/types';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
-import Header from './Header';
 import PrizeBanner from './PrizeBanner';
 import Leaderboard from './Leaderboard';
 
 export default function Dashboard() {
-  const [period, setPeriod] = useState<Period>('today');
   const [isResetting, setIsResetting] = useState(false);
-  const { ranked, lastUpdated, isLoading, error, refresh, clearLocal } = useLeaderboard(period);
+  // Period is fixed to 'today' — period switching removed from TV layout
+  const { ranked, isLoading, error, refresh, clearLocal } = useLeaderboard('today');
 
   const handleReset = async () => {
     if (!confirm('Are you sure you want to clear all results?')) return;
@@ -35,8 +33,8 @@ export default function Dashboard() {
       clearLocal();
       await refresh();
       console.log('[reset] leaderboard cleared and refreshed');
-    } catch (error) {
-      console.error('[reset] failed:', error);
+    } catch (err) {
+      console.error('[reset] failed:', err);
       alert('Reset failed');
     } finally {
       setIsResetting(false);
@@ -44,25 +42,19 @@ export default function Dashboard() {
   };
 
   return (
-  <div className="min-h-screen flex flex-col bg-fin-bg text-fin-text overflow-y-auto">
-    <Header
-      period={period}
-      onPeriodChange={setPeriod}
-      lastUpdated={lastUpdated}
-      onReset={handleReset}
-      isResetting={isResetting}
-    />
+    <div className="h-screen flex overflow-hidden bg-fin-bg text-fin-text">
 
-    <div className="flex-1 flex flex-col lg:flex-row">
-      <PrizeBanner />
+      {/* Left: prize + info panel */}
+      <PrizeBanner onReset={handleReset} isResetting={isResetting} />
 
-      <div className="flex-1 flex flex-col">
+      {/* Right: leaderboard — full height, no header overhead */}
+      <div className="flex-1 flex flex-col overflow-hidden">
         {isLoading ? (
           <div className="flex-1 flex flex-col items-center justify-center bg-fin-bg">
             <div className="text-[0.5rem] font-semibold tracking-[0.4em] text-fin-faint uppercase mb-5">
               Finaro Leaderboard
             </div>
-            <div className="text-xl sm:text-2xl font-black tracking-tight text-fin-text uppercase mb-4">
+            <div className="text-xl font-black tracking-tight text-fin-text uppercase mb-4">
               Laden…
             </div>
             <div className="w-8 h-px bg-fin-border" />
@@ -70,14 +62,14 @@ export default function Dashboard() {
         ) : (
           <Leaderboard ranked={ranked} />
         )}
-      </div>
-    </div>
 
-    {error && (
-      <div className="flex-shrink-0 px-5 py-2 bg-red-50 border-t border-red-200 text-red-600 text-[0.6rem] font-bold tracking-[0.2em] uppercase">
-        {error}
+        {error && (
+          <div className="flex-shrink-0 px-5 py-2 bg-red-50 border-t border-red-200 text-red-600 text-[0.6rem] font-bold tracking-[0.2em] uppercase">
+            {error}
+          </div>
+        )}
       </div>
-    )}
-  </div>
-);
+
+    </div>
+  );
 }
